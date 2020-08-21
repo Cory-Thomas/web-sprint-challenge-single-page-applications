@@ -1,10 +1,14 @@
 describe('Site Test', function() {
     it('visit site', function() {
-        cy.visit('http://localhost:3000/');
+        cy.visit('http://localhost:3000/form_test.js');
     })
 })
 
 describe('Form Input Tests', function(){
+    it('visit site', function() {
+        cy.contains('Make pizza').click()
+    })
+
     it('types name and checks/compares', function() {
         cy.get('input[name="name"]')
         .type('Cory')
