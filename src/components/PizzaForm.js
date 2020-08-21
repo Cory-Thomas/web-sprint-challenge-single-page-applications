@@ -10,7 +10,7 @@ const PizzaForm = () => {
             pepperoni: "",
             bacon: "",
             sausage: "",
-            mushroom: "",
+            mushroom: ""
         },
         specialInstr: ""
       });
@@ -22,7 +22,7 @@ const PizzaForm = () => {
             pepperoni: "",
             bacon: "",
             sausage: "",
-            mushroom: "",
+            mushroom: ""
         },
         specialInstr: ""
       });
@@ -37,8 +37,9 @@ const PizzaForm = () => {
             .oneOf(['small', 'medium', 'large'])
             .required('You must select a size'),
         toppings: Yup
-            .string()
-            .oneOf(['pepperoni', 'bacon', 'sausage', 'mushroom'])
+            .boolean()
+            // .string()
+            .oneOf(['pepperoni', 'bacon', 'sausage', 'mushroom'], 'You must select a topping')
             .required('You must select a topping'),
         specialInstr: Yup
             .string()
@@ -88,8 +89,30 @@ const PizzaForm = () => {
         });
       };
 
-      const handleCheckboxChange = event => {
-        const { name, checked } = event.target
+      const handleCheckboxChange = e => {
+        e.persist();
+        Yup.reach(formSchema, e.target.name)
+          .validate(e.target.value)
+          .then((valid) => {
+            console.log("valid");
+            setErrors({
+              ...errors,
+              toppings: {
+                ...values.toppings,
+                [e.target.name]: "",
+              }
+            });
+          })
+          .catch((err) => {
+            setErrors({
+              ...errors,
+              toppings: {
+                ...values.toppings,
+                [e.target.name]: e.errors[0],
+              }
+            });
+          });
+        const { name, checked } = e.target
         setValues({
             ...values,
             toppings: {
@@ -114,6 +137,7 @@ const PizzaForm = () => {
                 placeholder="Enter your name"
             />
         </label>
+        {errors.name.length > 0 && <p>{errors.name}</p>}
         </div>
         <div>
             <label>
@@ -129,12 +153,14 @@ const PizzaForm = () => {
                 <option value="large">Large</option>
             </select>
         </label>
+        {errors.pizzaSize.length > 0 && <p>{errors.pizzaSize}</p>}
         </div>
         <div>
            <label>
             Pepperoni <input 
                 type="checkbox" 
                 name="pepperoni"
+                value={values.toppings.pepperoni}
                 checked={values.toppings.pepperoni}
                 onChange={handleCheckboxChange}
             />
@@ -158,11 +184,12 @@ const PizzaForm = () => {
         <label>     
             Mushrooms <input 
                 type="checkbox"
-                name="mushrooms"
+                name="mushroom"
                 checked={values.toppings.mushroom}
                 onChange={handleCheckboxChange} 
             />
-        </label>   
+        </label>
+           
         </div>
         <div>
            <label>
@@ -173,7 +200,8 @@ const PizzaForm = () => {
                 onChange={handleChange}
                 value={values.specialInstr}
             />
-        </label> 
+        </label>
+        {errors.specialInstr.length > 0 && <p>{errors.specialInstr}</p>} 
         </div>
         
         <button type="submit">add to order</button>
