@@ -2,45 +2,48 @@ import React, { useState } from "react";
 import * as Yup from "yup";
 
 
-const PizzaForm = () => {
+const PizzaForm = ({state}) => {
     const [values, setValues] = useState({
         name: "",
         pizzaSize: "",
-        toppings: {
-            pepperoni: "",
-            bacon: "",
-            sausage: "",
-            mushroom: ""
-        },
+        pepperoni: "",
+        bacon: "",
+        sausage: "",
+        mushroom: "",
         specialInstr: ""
       });
     
       const [errors, setErrors] = useState({
         name: "",
         pizzaSize: "",
-        toppings: {
-            pepperoni: "",
-            bacon: "",
-            sausage: "",
-            mushroom: ""
-        },
+        pepperoni: "",
+        bacon: "",
+        sausage: "",
+        mushroom: "",
         specialInstr: ""
       });
 
       const formSchema = Yup.object().shape({
         name: Yup
             .string()
-            .min(3, "Name must be at least 3 characters long")
+            .min(2, "Name must be at least 2 characters long")
             .required(),
         pizzaSize: Yup
             .string()
             .oneOf(['small', 'medium', 'large'])
             .required('You must select a size'),
-        toppings: Yup
-            .boolean()
-            // .string()
-            .oneOf(['pepperoni', 'bacon', 'sausage', 'mushroom'], 'You must select a topping')
-            .required('You must select a topping'),
+        pepperoni: Yup
+            .string()
+            .oneOf([], 'You must select pepperoni'),
+        bacon: Yup
+            .string()
+            .oneOf([], 'You must select bacon'),
+        sausage: Yup
+            .string()
+            .oneOf([], 'You must select sausage'),
+        mushroom: Yup
+            .string()
+            .oneOf([], 'You must select mushroom'),
         specialInstr: Yup
             .string()
             .min(3, "Name must be at least 3 characters long")
@@ -70,58 +73,51 @@ const PizzaForm = () => {
           ...values,
           [e.target.name]: e.target.value
         });
+       
       }; 
     
       const handleSubmit = (e) => {
         e.preventDefault();
         console.log("submitting ", values);
-    
+       state(values);
         setValues({
             name: "",
             pizzaSize: "",
-            toppings: {
-                pepperoni: "",
-                bacon: "",
-                sausage: "",
-                mushroom: "",
-            },
+            pepperoni: "",
+            bacon: "",
+            sausage: "",
+            mushroom: "",
             specialInstr: ""
         });
       };
 
-      const handleCheckboxChange = e => {
-        e.persist();
-        Yup.reach(formSchema, e.target.name)
-          .validate(e.target.value)
+      
+
+      const handleCheckboxChange = evt => {
+        const { name, checked } = evt.target
+        
+        evt.persist();
+        Yup.reach(formSchema, evt.target.name)
+          .validate(evt.target.value)
           .then((valid) => {
             console.log("valid");
             setErrors({
               ...errors,
-              toppings: {
                 ...values.toppings,
-                [e.target.name]: "",
-              }
             });
           })
           .catch((err) => {
             setErrors({
               ...errors,
-              toppings: {
-                ...values.toppings,
-                [e.target.name]: e.errors[0],
-              }
+                [evt.target.name]: err.errors[0],
             });
           });
-        const { name, checked } = e.target
-        setValues({
-            ...values,
-            toppings: {
-              ...values.toppings,
-              [name]: checked,
-            }
-          })
+
+          setValues({
+          ...values,
+          [name]: checked,
+        })
       }
-      
 
 
   return (
@@ -160,32 +156,35 @@ const PizzaForm = () => {
             Pepperoni <input 
                 type="checkbox" 
                 name="pepperoni"
-                value={values.toppings.pepperoni}
-                checked={values.toppings.pepperoni}
+                checked={values.pepperoni}
                 onChange={handleCheckboxChange}
             />
         </label>
+        
         <label>
-            Sausage <input 
+            sausage <input 
                 type="checkbox" 
                 name="sausage"
-                checked={values.toppings.sausage}
+                checked={values.sausage}
                 onChange={handleCheckboxChange}
             />
         </label>
+
         <label>
             Bacon <input 
                 type="checkbox"
                 name="bacon"
-                checked={values.toppings.bacon}
+                value="bacon"
+                checked={values.bacon}
                 onChange={handleCheckboxChange} 
             />
         </label>
+
         <label>     
             Mushrooms <input 
                 type="checkbox"
                 name="mushroom"
-                checked={values.toppings.mushroom}
+                checked={values.mushroom}
                 onChange={handleCheckboxChange} 
             />
         </label>
